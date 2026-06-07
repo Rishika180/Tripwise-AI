@@ -93,13 +93,20 @@ router.post('/', async (req, res) => {
       // Generate AI itinerary for top result only (cost optimization)
     if (topResults.length > 0) {
       console.log(`Generating itinerary for: ${topResults[0].destination.name}`);
-      const aiResult = await generateItinerary(
-        topResults[0].destination,
-        userConstraints,
-        topResults[0].weatherData,
-        topResults[0].scores
-      );
-      topResults[0].aiItinerary = aiResult.itinerary;
+      try {
+        const aiResult = await generateItinerary(
+          topResults[0].destination,
+          userConstraints,
+          topResults[0].weatherData,
+          topResults[0].scores
+        );
+        if (aiResult.success) {
+          topResults[0].aiItinerary = aiResult.itinerary;
+        }
+        // If AI fails, recommendations still return — user can request itinerary later
+      } catch (aiError) {
+        console.error('AI itinerary generation failed:', aiError.message);
+      }
     }
 
     res.json({

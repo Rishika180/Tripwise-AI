@@ -9,21 +9,18 @@ const PORT = process.env.PORT || 3001;
 
 connectDB();
 
-// CORS: allow localhost for dev + Vercel domain for production
+// CORS: allow localhost for dev + exact Vercel domain for production
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.FRONTEND_URL // Set this on Render after Vercel deploy
+  'https://tripwise-ai-cyan.vercel.app',
+  process.env.FRONTEND_URL // Set on Render if using a different domain
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-      return callback(null, true);
-    }
-    // Allow any .vercel.app subdomain
-    if (origin.endsWith('.vercel.app')) {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     callback(new Error('Not allowed by CORS'));
